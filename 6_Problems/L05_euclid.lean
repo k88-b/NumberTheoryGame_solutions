@@ -1,5 +1,5 @@
-have h_gcd : IsGCD 3 10 1 := by
-  unfold IsGCD
+have h_gcd : IsGCD 3 10 1
+· unfold IsGCD
   constructor
   · constructor
     · exact one_dvd 3

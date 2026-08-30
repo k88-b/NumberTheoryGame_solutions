@@ -1,24 +1,32 @@
-unfold ModEq at hm hn
-unfold ModEq
-obtain ⟨k1, hk1⟩ := hm
-obtain ⟨k2, hk2⟩ := hn
-have h_eq : m * k1 = n * k2 := by rw [← hk1, hk2]
-have h_div : m ∣ (k2 * n) := by
-  use k1
-  have h_eq2 : k2 * n = n * k2 := by ring
-  rw [h_eq2, ← h_eq]
-have h_coprime_symm : IsGCD(n, m) 1 := by
-  unfold IsGCD at h_coprime
-  unfold IsGCD
-  obtain ⟨_, u, v, huv⟩ := h_coprime
-  constructor
-  · constructor
-    · exact one_dvd n
-    · exact one_dvd m
-  · use v, u
-    have h_eq3 : n * v + m * u = m * u + n * v := by ring
-    rw [h_eq3, huv]
-obtain ⟨k3, hk3⟩ := euclids_lemma k2 n m h_div h_coprime_symm
-use k3
-rw [hk2, hk3]
-ring
+  have h_pow2 : (a^2) ≡ (b^2) (mod m)
+  · exact mod_pow a b m 2 h
+
+  have h_term2_swap : (a^2 * c2) ≡ (b^2 * c2) (mod m)
+  · exact mod_mul_const (a^2) (b^2) c2 m h_pow2
+
+  have h_term2 : (c2 * a^2) ≡ (c2 * b^2) (mod m)
+  · have hrw1 : c2 * a^2 = a^2 * c2
+    · ring
+    have hrw2 : c2 * b^2 = b^2 * c2
+    · ring
+    rw [hrw1, hrw2]
+    exact h_term2_swap
+
+  have h_term1_swap : (a * c1) ≡ (b * c1) (mod m)
+  · exact mod_mul_const a b c1 m h
+
+  have h_term1 : (c1 * a) ≡ (c1 * b) (mod m)
+  · have hrw1 : c1 * a = a * c1
+    · ring
+    have hrw2 : c1 * b = b * c1
+    · ring
+    rw [hrw1, hrw2]
+    exact h_term1_swap
+
+  have h_term0 : c0 ≡ c0 (mod m)
+  · exact mod_refl c0 m
+
+  have h_sum12 : ((c2 * a^2) + (c1 * a)) ≡ ((c2 * b^2) + (c1 * b)) (mod m)
+  · exact mod_add (c2 * a^2) (c2 * b^2) (c1 * a) (c1 * b) m h_term2 h_term1
+
+  exact mod_add (c2 * a^2 + c1 * a) (c2 * b^2 + c1 * b) c0 c0 m h_sum12 h_term0
