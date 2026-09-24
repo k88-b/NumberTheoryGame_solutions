@@ -22,4 +22,4 @@ have hd2_amk : d2 ∣ a + m * k := by
 
 have hd2_d1 : d2 ∣ d1 := gcd_is_greatest (a + m * k) m d2 d1 h1 hd2_amk hd2_m
 
-exact Int.dvd_antisymm hd1 hd2 hd1_d2 hd2_d1
+exact dvd_antisymm hd1 hd2 hd1_d2 hd2_d1
