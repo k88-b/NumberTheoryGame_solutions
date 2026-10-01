@@ -1,0 +1,786 @@
+путь до файла: ./README.md
+# Number Theory Game Solutions
+
+This repository contains a complete set of working solutions for the **Number Theory Game**.
+
+These proofs are designed to successfully complete every level in the game. While they get the job done, they are not necessarily the most optimized or elegant approaches. If you find a shorter or better way to solve a level, contributions are highly welcome—please feel free to open a Pull Request!
+
+### Links
+
+* **Play the game:** [Number Theory Game](https://adam.math.hhu.de/#/g/k88-b/NumberTheoryGame)
+* **Game source code:** [k88-b/NumberTheoryGame](https://github.com/k88-b/NumberTheoryGame)
+
+
+путь до файла: ./4_LinCong/L09_crt_exists.lean
+unfold IsGCD at h_coprime
+obtain ⟨_, u, v, huv⟩ := h_coprime
+
+use a * n * v + b * m * u
+
+constructor
+· unfold ModEq
+
+  use b * u - a * u
+
+  have h_eq : (a * n * v + b * m * u) - a = m * (b * u - a * u) + a * (m * u + n * v - 1)
+  · ring
+
+  rw [h_eq, huv]
+  ring
+
+· unfold ModEq
+
+  use a * v - b * v
+
+  have h_eq : (a * n * v + b * m * u) - b = n * (a * v - b * v) + b * (m * u + n * v - 1)
+  · ring
+
+  rw [h_eq, huv]
+
+  ring
+
+
+путь до файла: ./4_LinCong/L10_crt_glue.lean
+  have h_pow2 : (a^2) ≡ (b^2) (mod m)
+  · exact mod_pow a b m 2 h
+
+  have h_term2_swap : (a^2 * c2) ≡ (b^2 * c2) (mod m)
+  · exact mod_mul_const (a^2) (b^2) c2 m h_pow2
+
+  have h_term2 : (c2 * a^2) ≡ (c2 * b^2) (mod m)
+  · have hrw1 : c2 * a^2 = a^2 * c2
+    · ring
+    have hrw2 : c2 * b^2 = b^2 * c2
+    · ring
+    rw [hrw1, hrw2]
+    exact h_term2_swap
+
+  have h_term1_swap : (a * c1) ≡ (b * c1) (mod m)
+  · exact mod_mul_const a b c1 m h
+
+  have h_term1 : (c1 * a) ≡ (c1 * b) (mod m)
+  · have hrw1 : c1 * a = a * c1
+    · ring
+    have hrw2 : c1 * b = b * c1
+    · ring
+    rw [hrw1, hrw2]
+    exact h_term1_swap
+
+  have h_term0 : c0 ≡ c0 (mod m)
+  · exact mod_refl c0 m
+
+  have h_sum12 : ((c2 * a^2) + (c1 * a)) ≡ ((c2 * b^2) + (c1 * b)) (mod m)
+  · exact mod_add (c2 * a^2) (c2 * b^2) (c1 * a) (c1 * b) m h_term2 h_term1
+
+  exact mod_add (c2 * a^2 + c1 * a) (c2 * b^2 + c1 * b) c0 c0 m h_sum12 h_term0
+
+
+путь до файла: ./4_LinCong/L07_sol_shift.lean
+unfold IsGCD at hd
+obtain ⟨⟨hda, _⟩, _⟩ := hd
+obtain ⟨a1, ha1⟩ := hda
+
+have h_shift : (a * (x0 + t * m1)) = a * x0 + (a1 * t) * m
+· rw [ha1, hm]
+  ring
+
+have h_cong : (a * (x0 + t * m1)) ≡ (a * x0) (mod m)
+· rw [h_shift]
+  exact mod_add_multiple (a * x0) (a1 * t) m
+
+exact mod_trans (a * (x0 + t * m1)) (a * x0) b m h_cong h0
+
+
+путь до файла: ./4_LinCong/L06_sol_equiv.lean
+have h_trans : (a * x1) ≡ (a * x2) (mod m)
+· have h2_symm : b ≡ (a * x2) (mod m)
+  · exact mod_symm (a * x2) b m h2
+
+  exact mod_trans (a * x1) b (a * x2) m h1 h2_symm
+
+have h_eq : (x1 * a) ≡ (x2 * a) (mod m)
+· have hrw1 : x1 * a = a * x1
+  · ring
+
+  have hrw2 : x2 * a = a * x2
+  · ring
+
+  rw [hrw1, hrw2]
+  exact h_trans
+
+exact mod_cancel_general x1 x2 a m d a1 m1 hd_not_zero h_eq hd ha hm
+
+
+путь до файла: ./4_LinCong/L01_inv_exists.lean
+unfold IsGCD at h
+obtain ⟨_, x, y, hxy⟩ := h
+use x
+unfold ModEq
+use -y
+
+have h_eq : a * x - 1 = (a * x + m * y) - 1 - m * y
+· ring
+
+rw [h_eq, hxy]
+· ring
+
+
+путь до файла: ./4_LinCong/L08_euclid.lean
+have h_cong : (a * c) ≡ (0 * c) (mod m)
+· unfold ModEq
+
+  have h_eq1 : a * c - 0 * c = a * c
+  · ring
+
+  rw [h_eq1]
+  exact h_div
+
+have h_cancel : a ≡ 0 (mod m)
+· exact mod_cancel_coprime a 0 c m h_cong h_coprime
+
+unfold ModEq at h_cancel
+
+have h_eq2 : a = a - 0
+· ring
+
+rw [h_eq2]
+exact h_cancel
+
+
+путь до файла: ./4_LinCong/L02_inv_reverse.lean
+obtain ⟨x, hx⟩ := h
+unfold ModEq at hx
+obtain ⟨k, hk⟩ := hx
+
+have h_bezout : ∃ u v : ℤ, a * u + m * v = 1
+· use x, -k
+
+  have h_eq : a * x + m * (-k) = (a * x - 1) - m * k + 1
+  · ring
+
+  rw [h_eq, hk]
+  ring
+
+exact bezout_imp_coprime a m h_bezout
+
+
+путь до файла: ./4_LinCong/L03_inv_unique.lean
+have h_exists : ∃ k, (a * k) ≡ 1 (mod m)
+· use x
+
+have h_coprime : IsGCD a m 1
+· exact inv_implies_coprime a m h_exists
+
+have h_trans : (a * x) ≡ (a * y) (mod m)
+· have hy_symm : 1 ≡ (a * y) (mod m)
+  · exact mod_symm (a * y) 1 m hy
+
+  exact mod_trans (a * x) 1 (a * y) m hx hy_symm
+
+have h_eq : (x * a) ≡ (y * a) (mod m)
+· have hrw1 : x * a = a * x
+  · ring
+
+  have hrw2 : y * a = a * y
+  · ring
+
+  rw [hrw1, hrw2]
+  exact h_trans
+
+exact mod_cancel_coprime x y a m h_eq h_coprime
+
+
+путь до файла: ./4_LinCong/L11_poly.lean
+have h_pow2 : (a^2) ≡ (b^2) (mod m)
+exact mod_pow a b m 2 h
+have h_term2_swap : (a^2 * c2) ≡ (b^2 * c2) (mod m)
+exact mod_mul_const (a^2) (b^2) c2 m h_pow2
+have h_term2 : (c2 * a^2) ≡ (c2 * b^2) (mod m)
+
+have hrw1 : c2 * a^2 = a^2 * c2
+ring
+
+have hrw2 : c2 * b^2 = b^2 * c2
+ring
+
+rw [hrw1, hrw2]
+exact h_term2_swap
+
+have h_term1_swap : (a * c1) ≡ (b * c1) (mod m)
+exact mod_mul_const a b c1 m h
+have h_term1 : (c1 * a) ≡ (c1 * b) (mod m)
+
+have hrw1 : c1 * a = a * c1
+ring
+have hrw2 : c1 * b = b * c1
+ring
+
+rw [hrw1, hrw2]
+exact h_term1_swap
+
+have h_term0 : c0 ≡ c0 (mod m)
+exact mod_refl c0 m
+
+have h_sum12 : ((c2 * a^2) + (c1 * a)) ≡ ((c2 * b^2) + (c1 * b)) (mod m)
+exact mod_add (c2 * a^2) (c2 * b^2) (c1 * a) (c1 * b) m h_term2 h_term1
+exact mod_add (c2 * a^2 + c1 * a) (c2 * b^2 + c1 * b) c0 c0 m h_sum12 h_term0
+
+
+путь до файла: ./4_LinCong/L04_sol_nec.lean
+unfold IsGCD at hd
+obtain ⟨⟨hda, hdm⟩, _⟩ := hd
+
+unfold ModEq at hx
+obtain ⟨k, hk⟩ := hx
+
+have h1 : d ∣ (a * x)
+· exact dvd_mul_of_dvd_left hda x
+
+have h2 : d ∣ (m * k)
+· exact dvd_mul_of_dvd_left hdm k
+
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+
+use k1 - k2
+
+have h_eq : b = a * x - m * k
+· rw [← hk]
+  ring
+
+rw [h_eq, hk1, hk2]
+ring
+
+
+путь до файла: ./4_LinCong/L05_sol_suff.lean
+unfold IsGCD at hd
+obtain ⟨_, u, v, huv⟩ := hd
+
+obtain ⟨k, hk⟩ := hb
+
+use u * k
+unfold ModEq
+
+use -v * k
+rw [hk]
+
+have h_eq : a * (u * k) - d * k = m * (-v * k) + k * (a * u + m * v - d)
+· ring
+
+rw [h_eq, huv]
+ring
+
+
+путь до файла: ./.gitignore
+.sol.txt
+
+
+путь до файла: ./sol.txt
+
+
+путь до файла: ./2_Congruence/L02_mod_symm.lean
+unfold ModEq at *
+obtain ⟨k, hk⟩ := h
+use -k
+
+have h_eq : b - a = -(a - b)
+· ring
+
+rw [h_eq, hk]
+ring
+
+
+путь до файла: ./2_Congruence/L09_mod_scale.lean
+unfold ModEq at *
+obtain ⟨k, hk⟩ := h
+use k
+
+have h_eq : a * c - b * c = (a - b) * c
+· ring
+
+rw [h_eq, hk]
+ring
+
+
+путь до файла: ./2_Congruence/L10_mod_dvd.lean
+unfold ModEq at *
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+use k2 * k1
+rw [hk1, hk2]
+ring
+
+
+путь до файла: ./2_Congruence/L07_add_mul_mod.lean
+unfold ModEq
+use k
+ring
+
+
+путь до файла: ./2_Congruence/L11_mod_split.lean
+constructor
+· unfold ModEq at *
+  obtain ⟨k, hk⟩ := h
+  use n * k
+  rw [hk]
+  ring
+· unfold ModEq at *
+  obtain ⟨k, hk⟩ := h
+  use m * k
+  rw [hk]
+  ring
+
+
+путь до файла: ./2_Congruence/L06_mul.lean
+have step1 : (a * c) ≡ (b * c) (mod m)
+· exact mod_mul_const a b c m h1
+
+have step2 : (c * b) ≡ (d * b) (mod m)
+· exact mod_mul_const c d b m h2
+
+have step2_symm : (b * c) ≡ (b * d) (mod m)
+· have hrw1 : b * c = c * b
+  · ring
+
+  have hrw2 : b * d = d * b
+  · ring
+
+  rw [hrw1, hrw2]
+  exact step2
+
+exact mod_trans (a * c) (b * c) (b * d) m step1 step2_symm
+
+
+путь до файла: ./2_Congruence/L03_mod_trans.lean
+unfold ModEq at *
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+use k1 + k2
+
+have h_eq : a - c = (a - b) + (b - c)
+· ring
+
+rw [h_eq, hk1, hk2]
+ring
+
+
+путь до файла: ./2_Congruence/L05_mul_const.lean
+unfold ModEq at *
+obtain ⟨k, hk⟩ := h
+use k * c
+
+have h_eq : a * c - b * c = (a - b) * c
+· ring
+
+rw [h_eq, hk]
+ring
+
+
+путь до файла: ./2_Congruence/L04_add.lean
+unfold ModEq at *
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+use k1 + k2
+
+have h_eq : (a + c) - (b + d) = (a - b) + (c - d)
+· ring
+
+rw [h_eq, hk1, hk2]
+ring
+
+
+путь до файла: ./2_Congruence/L01_mod_refl.lean
+unfold ModEq
+use 0
+ring
+
+
+путь до файла: ./2_Congruence/L08_pow.lean
+induction' n with d ih
+unfold ModEq
+use 0
+ring
+rw [pow_succ, pow_succ]
+exact mod_mul (a^d) (b^d) a b m ih h
+
+
+путь до файла: ./3_GCD/L01_dvd_mul.lean
+obtain ⟨k, hk⟩ := h
+use k * b
+rw [hk]
+
+ring
+
+
+путь до файла: ./3_GCD/L09_cancel_general.lean
+have hcoprime : IsGCD c1 m1 1
+· exact gcd_div_coprime c m d c1 m1 hd h2 hc hm
+unfold ModEq at h1
+obtain ⟨k, hk⟩ := h1
+rw [hc, hm] at hk
+
+have e : a * (c1 * d) - b * (c1 * d) = d * (a * c1 - b * c1)
+· ring
+
+have e2 : m1 * d * k = d * (m1 * k)
+· ring
+
+rw [e, e2] at hk
+
+have hk2 : a * c1 - b * c1 = m1 * k
+· exact mul_left_cancel₀ hd hk
+
+have h1' : (a * c1) ≡ (b * c1) (mod m1)
+· unfold ModEq
+  use k
+
+exact mod_cancel_coprime a b c1 m1 h1' hcoprime
+
+
+путь до файла: ./3_GCD/L06_gcd_symm.lean
+unfold IsGCD at *
+obtain ⟨⟨hda, hdb⟩, x, y, hxy⟩ := h
+constructor
+· constructor
+  · exact hdb
+  · exact hda
+use y, x
+
+have h_eq : b * y + a * x = a * x + b * y
+· ring
+
+rw [h_eq, hxy]
+
+
+путь до файла: ./3_GCD/L10_gcd_shift.lean
+have hd1_amk : d1 ∣ a + m * k
+· exact h1.1.1
+
+have hd1_m : d1 ∣ m
+· exact h1.1.2
+
+have hd2_a : d2 ∣ a
+· exact h2.1.1
+
+have hd2_m : d2 ∣ m
+· exact h2.1.2
+
+have hd1_a : d1 ∣ a
+· obtain ⟨x, hx⟩ := hd1_amk
+  obtain ⟨y, hy⟩ := hd1_m
+  use x - y * k
+
+  have h_eq1 : a = (a + m * k) - m * k
+  · ring
+
+  rw [h_eq1, hx, hy]
+  ring
+
+have hd1_d2 : d1 ∣ d2
+· exact gcd_is_greatest a m d1 d2 h2 hd1_a hd1_m
+
+have hd2_amk : d2 ∣ a + m * k
+· obtain ⟨x, hx⟩ := hd2_a
+  obtain ⟨y, hy⟩ := hd2_m
+  use x + y * k
+  rw [hx, hy]
+  ring
+
+have hd2_d1 : d2 ∣ d1
+· exact gcd_is_greatest (a + m * k) m d2 d1 h1 hd2_amk hd2_m
+
+exact Int.dvd_antisymm hd1 hd2 hd1_d2 hd2_d1
+
+
+путь до файла: ./3_GCD/L04_coprime_forward.lean
+unfold IsGCD at h
+obtain ⟨_, x, y, hxy⟩ := h
+
+use x, y
+
+
+путь до файла: ./3_GCD/L05_coprime_backward.lean
+unfold IsGCD
+constructor
+· constructor
+  · Hint (hidden := true) "Remember the theorem `one_dvd` from World 1? It proves that 1 divides everything."
+    exact one_dvd c
+  · exact one_dvd m
+
+· exact h
+
+
+путь до файла: ./3_GCD/L03_gcd_greatest.lean
+unfold IsGCD at h
+
+obtain ⟨⟨hda, hdb⟩, x, y, hxy⟩ := h
+
+have h1 : c ∣ (a * x)
+· exact dvd_mul_of_dvd_left hca x
+
+have h2 : c ∣ (b * y)
+· exact dvd_mul_of_dvd_left hcb y
+
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+use k1 + k2
+rw [← hxy, hk1, hk2]
+
+ring
+
+
+путь до файла: ./3_GCD/L08_gcd_div_coprime.lean
+unfold IsGCD at *
+obtain ⟨_, x, y, hxy⟩ := h
+constructor
+· constructor
+  · exact one_dvd c1
+  · exact one_dvd m1
+· use x, y
+
+  have e : d * (c1 * x + m1 * y) = c1 * d * x + m1 * d * y
+  · ring
+
+  have h_eq : d * (c1 * x + m1 * y) = d * 1
+  · rw [e, ← hc, ← hm, hxy]
+    ring
+
+  exact mul_left_cancel₀ hd h_eq
+
+
+путь до файла: ./3_GCD/L07_cancel_coprime.lean
+unfold ModEq at *
+unfold IsGCD at h2
+obtain ⟨k, hk⟩ := h1
+obtain ⟨_, x, y, hxy⟩ := h2
+
+use k * x + (a - b) * y
+
+have h_eq1 : m * (k * x + (a - b) * y) = (m * k) * x + (a - b) * (m * y)
+· ring
+
+have h_eq2 : (a * c - b * c) * x + (a - b) * (m * y) = (a - b) * (c * x + m * y)
+· ring
+
+rw [h_eq1, ← hk, h_eq2, hxy]
+
+ring
+
+
+путь до файла: ./3_GCD/L02_gcd_def.lean
+unfold IsGCD
+constructor
+· Hint "The first goal is *also* an `∧`. Use `constructor` again!"
+  constructor
+  · use 2
+    ring
+  · use 3
+    ring
+· Hint (hidden := true) "To show `2 * x + 3 * y = 1`, try `x = -1` and `y = 1`. Type `use -1, 1`. (use can take multiple witnesses separated by commas)"
+  use -1, 1
+
+  ring
+
+
+путь до файла: ./5_DivRules/L06_div3.lean
+have h9 : (c2 * 10 ^ 2 + c1 * 10 + c0) ≡ c2 * 1 ^ 2 + c1 * 1 + c0 (mod 9)
+· exact div9_rule_3 c0 c1 c2
+
+have h3 : (3 : ℤ) ∣ 9
+· use 3
+  ring
+
+exact mod_shrink (c2 * 10^2 + c1 * 10 + c0) (c2 * 1^2 + c1 * 1 + c0) 9 3 h9 h3
+
+
+путь до файла: ./5_DivRules/L05_div9.lean
+have h10 : 10 ≡ 1 (mod 9)
+· unfold ModEq
+  use 1
+  ring
+
+exact polynomial_cong 10 1 c0 c1 c2 9 h10
+
+
+путь до файла: ./5_DivRules/L02_div2.lean
+have h10 : (10 * k + d) ≡ d (mod 10)
+· exact div10_rule k d
+
+have h2 : (2 : ℤ) ∣ 10
+· use 5
+  ring
+
+exact mod_shrink (10 * k + d) d 10 2 h10 h2
+
+
+путь до файла: ./5_DivRules/L07_div11.lean
+have h10 : 10 ≡ -1 (mod 11)
+· unfold ModEq
+  use 1
+  ring
+
+exact polynomial_cong 10 (-1) c0 c1 c2 11 h10
+
+
+путь до файла: ./5_DivRules/L04_div4.lean
+have h_eq : 100 * k + d = d + (25 * k) * 4
+· ring
+
+rw [h_eq]
+
+exact mod_add_multiple d (25 * k) 4
+
+
+путь до файла: ./5_DivRules/L01_div10.lean
+have h_eq : 10 * k + d = d + k * 10
+· ring
+
+rw [h_eq]
+exact mod_add_multiple d k 10
+
+
+путь до файла: ./5_DivRules/L03_div5.lean
+have h10 : (10 * k + d) ≡ d (mod 10)
+· exact div10_rule k d
+
+have h5 : (5 : ℤ) ∣ 10
+· use 2
+  ring
+
+exact mod_shrink (10 * k + d) d 10 5 h10 h5
+
+
+путь до файла: ./6_Problems/L05_euclid.lean
+have h_gcd : IsGCD 3 10 1
+· unfold IsGCD
+  constructor
+  · constructor
+    · exact one_dvd 3
+    · exact one_dvd 10
+  · use -3, 1
+    ring
+
+exact euclids_lemma x 3 10 h h_gcd
+
+
+путь до файла: ./6_Problems/L01_large_powers.lean
+have h1 : 17 ≡ 2 (mod 5)
+· unfold ModEq
+  use 3
+  ring
+
+have h2 : 12 ≡ 2 (mod 5)
+· unfold ModEq
+  use 2
+  ring
+
+have h3 : (17 ^ 100) ≡ (2 ^ 100) (mod 5)
+· exact mod_pow 17 2 5 100 h1
+
+have h4 : (12 ^ 100) ≡ (2 ^ 100) (mod 5)
+· exact mod_pow 12 2 5 100 h2
+
+exact mod_add (17^100) (2^100) (12^100) (2^100) 5 h3 h4
+
+
+путь до файла: ./6_Problems/L03_crt.lean
+have h_gcd : IsGCD 10 3 1
+· unfold IsGCD
+  constructor
+  · constructor
+    · exact one_dvd 10
+    · exact one_dvd 3
+  · use 1, -3
+    ring
+
+exact crt_exists 7 2 10 3 h_gcd
+
+
+путь до файла: ./6_Problems/L04_lincong.lean
+have h_gcd : IsGCD 5 7 1
+· unfold IsGCD
+  constructor
+  · constructor
+    · exact one_dvd 5
+    · exact one_dvd 7
+  · use 3, -2
+    ring
+
+have h_div : (1: ℤ) ∣ 3
+· use 3
+  ring
+
+exact lin_cong_suff 5 3 7 1 h_gcd h_div
+
+
+путь до файла: ./6_Problems/L06_shrink_shift.lean
+have h_div : (4 : ℤ) ∣ 100
+· use 25
+  ring
+
+have h_shrink : x ≡ 23 (mod 4)
+· exact mod_shrink x 23 100 4 h h_div
+
+have h_23 : 23 ≡ 3 (mod 4)
+· unfold ModEq
+  use 5
+  ring
+
+exact mod_trans x 23 3 4 h_shrink h_23
+
+
+путь до файла: ./6_Problems/L02_cancel.lean
+have h_gcd : IsGCD 14 9 1
+unfold IsGCD
+constructor
+· constructor
+  · exact one_dvd 14
+  · exact one_dvd 9
+· use 2, -3
+  ring
+
+have h_swap : (x * 14) ≡ (y * 14) (mod 9)
+
+· have hrw1 : x * 14 = 14 * x
+  · ring
+
+  have hrw2 : y * 14 = 14 * y
+  · ring
+
+  rw [hrw1, hrw2]
+
+  exact h
+
+exact mod_cancel_coprime x y 14 9 h_swap h_gcd
+
+
+путь до файла: ./1_Divisibility/L04_dvd_zero.lean
+use 0
+ring
+
+
+путь до файла: ./1_Divisibility/L02_what_is_dvd.lean
+intro a
+use a
+ring
+
+
+путь до файла: ./1_Divisibility/L03_dvd_refl.lean
+use 1
+ring
+
+
+путь до файла: ./1_Divisibility/L01_first_proof.lean
+use 4
+
+
+путь до файла: ./1_Divisibility/L05_dvd_trans.lean
+obtain ⟨k1, hk1⟩ := h1
+obtain ⟨k2, hk2⟩ := h2
+
+use k1 * k2
+
+rw [hk2, hk1]
+ring
+
+
