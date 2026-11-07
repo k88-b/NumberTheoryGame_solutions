@@ -15,8 +15,8 @@ have h_coprime : IsGCD 25 11 1
 · unfold IsGCD
   constructor
   · constructor
-    · exact one_dvd 25
-    · exact one_dvd 11
+    · exact one_dvd_int 25
+    · exact one_dvd_int 11
 
   · use 4, -9
     ring

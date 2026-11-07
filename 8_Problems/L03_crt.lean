@@ -2,8 +2,8 @@ have h_gcd : IsGCD 10 3 1
 · unfold IsGCD
   constructor
   · constructor
-    · exact one_dvd 10
-    · exact one_dvd 3
+    · exact one_dvd_int 10
+    · exact one_dvd_int 3
   · use 1, -3
     ring
 

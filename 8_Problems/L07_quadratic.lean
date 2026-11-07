@@ -8,4 +8,3 @@ have h : x^2 - 5*x + 6 = (x - 2) * (x - 3)
 rw [h, hk1, hk2]
 use k1 * k2
 ring
-

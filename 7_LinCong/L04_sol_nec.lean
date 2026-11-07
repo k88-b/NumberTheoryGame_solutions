@@ -5,10 +5,10 @@ unfold ModEq at hx
 obtain ⟨k, hk⟩ := hx
 
 have h1 : d ∣ (a * x)
-· exact dvd_mul_of_dvd_left hda x
+· exact dvd_mul_of_dvd_left_int a x d hda
 
 have h2 : d ∣ (m * k)
-· exact dvd_mul_of_dvd_left hdm k
+· exact dvd_mul_of_dvd_left_int m k d hdm
 
 obtain ⟨k1, hk1⟩ := h1
 obtain ⟨k2, hk2⟩ := h2

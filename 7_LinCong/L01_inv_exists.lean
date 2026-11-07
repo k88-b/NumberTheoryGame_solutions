@@ -8,4 +8,4 @@ have h_eq : a * x - 1 = (a * x + m * y) - 1 - m * y
 · ring
 
 rw [h_eq, hxy]
-· ring
+ring
